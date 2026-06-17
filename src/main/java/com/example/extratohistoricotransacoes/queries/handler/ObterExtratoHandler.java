@@ -17,6 +17,7 @@ public class ObterExtratoHandler {
 
     @Autowired
     private RedisTemplate<String, ExtratoDto> redis;
+    
     private final LocalDate Hoje = LocalDate.now();
     
     public Set<ExtratoDto> obterExtratoTransacao(String contaId, LocalDate[] periodo) {

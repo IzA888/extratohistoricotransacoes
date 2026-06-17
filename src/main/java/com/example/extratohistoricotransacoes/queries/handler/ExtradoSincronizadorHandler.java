@@ -12,6 +12,7 @@ import com.example.extratohistoricotransacoes.shared.TransacaoConcluidaEvent;
 
 @Component
 public class ExtradoSincronizadorHandler {
+    
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
