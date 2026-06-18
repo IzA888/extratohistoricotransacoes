@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.extratohistoricotransacoes.commands.model.TipoTransacaoEnum;
 import com.example.extratohistoricotransacoes.commands.model.Transacao;
 
-public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
+public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
     // // Buscar por conta
     // List<Transacao> findByConta(Integer conta);
     
@@ -35,5 +35,5 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
 
     Optional<Transacao> findById(UUID id);
 
-    Boolean existsById(UUID id);
+    boolean existsById(UUID id);
 }
