@@ -1,5 +1,6 @@
 package com.example.extratohistoricotransacoes.commands.rest;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.springframework.beans.BeanUtils;
@@ -47,15 +48,15 @@ public class CommandsRest {
     private Transacao toEntity(TransacaoDto transacaoDto) {
         Transacao transacao = new Transacao();
         BeanUtils.copyProperties(transacaoDto, transacao);
+        transacao.setValor(BigDecimal.valueOf(transacaoDto.valor()));
         return transacao;
     }
 
     private TransacaoDto toDto(Transacao transacao) {
         return new TransacaoDto(
-            transacao.getConta().toString(),
-            transacao.getDescricao(),
-            transacao.getTipo().toString(),
-            transacao.getValor().doubleValue()
-        );
+                transacao.getConta(),
+                transacao.getDescricao(),
+                transacao.getTipo(),
+                transacao.getValor().doubleValue());
     }
 }

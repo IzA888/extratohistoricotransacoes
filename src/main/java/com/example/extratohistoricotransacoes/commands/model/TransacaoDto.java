@@ -1,9 +1,9 @@
 package com.example.extratohistoricotransacoes.commands.model;
 
 public record TransacaoDto(
-        String conta,
+        Integer conta,
         String descricao,
-        String tipo,
+        TipoTransacaoEnum tipo,
         double valor
 ) {
 

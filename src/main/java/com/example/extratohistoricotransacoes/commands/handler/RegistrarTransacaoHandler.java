@@ -70,12 +70,16 @@ public class RegistrarTransacaoHandler {
 
     // Processamento
     private Boolean verificarDuplicacao(Transacao transacao) {
-        Transacao existente = obterPorId(transacao.getId());
-        if (transacao.equals(existente)) {
-            return Boolean.FALSE;
-        } else {
+        if (transacao.getId() == null) {
             return Boolean.TRUE;
         }
+
+        Transacao existente = repository.findById(transacao.getId()).orElse(null);
+        if (existente == null) {
+            return Boolean.TRUE;
+        }
+
+        return !transacao.equals(existente);
     }
 
     private BigDecimal aplicarTaxas(Transacao transacao) {
