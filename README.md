@@ -74,8 +74,45 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-<!-- ## Melhoria de usabilidade
+## Teste de carga
 
-- Apresentar mensagens de erro claras em caso de transação duplicada ou não encontrada
-- Garantir que a leitura de extrato retorne resultados ordenados por data mais recente
-- Centralizar lógica de período e normalização de datas para evitar duplicação -->
+O projeto inclui um script de teste de carga em `teste-carga.js` que utiliza k6 para validar o desempenho das operações de escrita e leitura.
+
+- 20% das requisições simulam o registro de transações em `/commands/registrar`
+- 80% das requisições consultam extratos em `/queries/{conta}/...`
+- Cenários de ramp-up, pico e ramp-down com limites de falha e latência
+- Permite testar endpoints como `semana`, `mes`, `ano`, `ultimos-dias`, `ultimos-meses` e `ultimos-anos`
+
+Para executar o teste:
+
+```bash
+k6 run teste-carga.js
+```
+
+Ajuste `BASE_URL` no script caso o serviço esteja rodando em outro endereço ou porta.
+
+### Resultados do teste de carga
+
+⚠️ **Explicação dos resultados:**
+
+O teste indica que o serviço respondeu corretamente na maioria das leituras e gravações, mas apresentou **alta latência em consultas**, com apenas **3% dos acessos de leitura atendidos em menos de 20ms**. Isso sugere a necessidade de **otimização de desempenho** para melhorar a velocidade das consultas de extrato.
+
+```
+TOTAL RESULTS 
+
+    checks_total.......: 88989  494.016809/s
+    checks_succeeded...: 57.28% 50975 out of 88989
+    checks_failed......: 42.71% 38014 out of 88989
+
+    ✗ Leitura - Status é 200
+      ↳  99% — ✓ 39508 / ✗ 3
+    ✗ Leitura - Resposta rápida (<20ms)
+      ↳  3% — ✓ 1501 / ✗ 38010
+    ✗ Escrita - Status é 201 ou 200
+      ↳  99% — ✓ 9966 / ✗ 1
+
+    NETWORK
+    data_received..................: 205 MB 1.1 MB/s
+    data_sent......................: 6.8 MB 38 kB/s
+
+```
