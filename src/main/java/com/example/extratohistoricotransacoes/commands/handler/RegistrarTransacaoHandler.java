@@ -40,7 +40,7 @@ public class RegistrarTransacaoHandler {
                     transacaoSalva.getDescricao(),
                     transacaoSalva.getValor().doubleValue(),
                     transacaoSalva.getTipo().toString(),
-                    transacaoSalva.getDataHora().toEpochSecond(ZoneOffset.UTC)));
+                    transacaoSalva.getDataHora().atOffset(ZoneOffset.UTC).toInstant().toEpochMilli()));
             return transacaoSalva;
         } else {
             throw new IllegalArgumentException("Transacao duplicada: " + transacao);
@@ -61,7 +61,7 @@ public class RegistrarTransacaoHandler {
 
     @Transactional
     public void deletarPorId(UUID id) {
-        if(repository.existsById(id)){
+        if (repository.existsById(id)) {
             repository.deleteById(id);
         } else {
             throw new IllegalArgumentException("Transação não encontrada para o id: " + id);

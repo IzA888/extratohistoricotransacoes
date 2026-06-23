@@ -4,15 +4,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.example.extratohistoricotransacoes.queries.dto.ExtratoDto;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
@@ -22,24 +19,26 @@ public class RedisConfig {
     public RedisTemplate<String, ExtratoDto> extratoRedisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, ExtratoDto> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setHashKeySerializer(new StringRedisSerializer());
+        // 1. Configura a chave como String limpa
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
 
-        // 🌟 Configura o Jackson para tratar corretamente datas (LocalDate/Instant) e tipos do Java 8+
+        // 2. Configura o ObjectMapper para dar suporte a Records e Datas
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // Garante suporte a LocalDate/Instant
-        objectMapper.activateDefaultTyping(
-            LaissezFaireSubTypeValidator.instance, 
-            ObjectMapper.DefaultTyping.NON_FINAL, 
-            JsonTypeInfo.As.PROPERTY
-        );
+        objectMapper.registerModule(new JavaTimeModule()); // Suporte a LocalDate/LocalDateTime
 
-        // 🌟 Cria o serializador amarrado especificamente ao seu ExtratoDto
-        Jackson2JsonRedisSerializer<ExtratoDto> jsonSerializer = 
-                new Jackson2JsonRedisSerializer<>(objectMapper, ExtratoDto.class);
+        // 🌟 ESSENCIAL: Impede que o Jackson estoure erro ao ler o campo "@class" residual
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        // 3. Cria o serializador TIPADO apontando para o seu DTO e injeta o
+        // objectMapper
+        Jackson2JsonRedisSerializer<ExtratoDto> jsonSerializer = new Jackson2JsonRedisSerializer<>(objectMapper,
+                ExtratoDto.class);
+
+        template.setValueSerializer(jsonSerializer);
+        template.setHashValueSerializer(jsonSerializer);
+        template.setDefaultSerializer(jsonSerializer);
         template.afterPropertiesSet();
         return template;
     }

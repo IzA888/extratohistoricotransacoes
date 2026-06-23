@@ -28,8 +28,13 @@ public class ExtradoSincronizadorHandler {
             transacaoEvent.descricao(),
             transacaoEvent.timestamp()
         );
-
-        redisTemplate.opsForZSet().add(key, extrato, transacaoEvent.timestamp());
+        
+        try{
+            System.out.println("Disparar Redis, extrato: " + extrato.toString());
+            redisTemplate.opsForZSet().add(key, extrato, transacaoEvent.timestamp());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
