@@ -30,19 +30,19 @@ public class ObterExtratoHandler {
     public Set<ExtratoDto> obterExtratoSemana(String contaId) {
         String key = chaveContaExtrato(contaId);
         long[] range = obterExtratoSemanaRange(Hoje);
-        return redis.opsForZSet().reverseRangeByScore(key, range[1], range[0]);
+        return redis.opsForZSet().reverseRangeByScore(key, range[0], range[1]);
     }
 
     public Set<ExtratoDto> obterExtratoMes(String contaId) {
         String key = chaveContaExtrato(contaId);
         long[] range = obterExtratoMesRange(Hoje);
-        return redis.opsForZSet().reverseRangeByScore(key, range[1], range[0]);
+        return redis.opsForZSet().reverseRangeByScore(key, range[0], range[1]);
     }
 
     public Set<ExtratoDto> obterExtratoAno(String contaId) {
         String key = chaveContaExtrato(contaId);
         long[] range = obterExtratoAnoRange(Hoje);
-        return redis.opsForZSet().reverseRangeByScore(key, range[1], range[0]);
+        return redis.opsForZSet().reverseRangeByScore(key, range[0], range[1]);
     }
 
     public Set<ExtratoDto> obterExtratoXDias(String contaId, int dias) {
@@ -51,7 +51,7 @@ public class ObterExtratoHandler {
         LocalDate inicio = Hoje.minusDays(dias - 1);
         long[] data = normalizarData(inicio);
         String key = chaveContaExtrato(contaId);
-        return redis.opsForZSet().reverseRangeByScore(key, data[1], data[0]);
+        return redis.opsForZSet().reverseRangeByScore(key, data[0], data[1]);
     }
 
     public Set<ExtratoDto> obterExtratoXMeses(String contaId, int meses) {
@@ -60,7 +60,7 @@ public class ObterExtratoHandler {
         LocalDate inicio = Hoje.minusMonths(meses - 1).withDayOfMonth(1);
         long[] data = normalizarData(inicio);
         String key = chaveContaExtrato(contaId);
-        return redis.opsForZSet().reverseRangeByScore(key, data[1], data[0]);
+        return redis.opsForZSet().reverseRangeByScore(key, data[0], data[1]);
     }
 
     public Set<ExtratoDto> obterExtratoXAnos(String contaId, int anos) {
@@ -69,7 +69,7 @@ public class ObterExtratoHandler {
         LocalDate inicio = Hoje.minusYears(anos - 1).withDayOfYear(1);
         long[] data = normalizarData(inicio);
         String key = chaveContaExtrato(contaId);
-        return redis.opsForZSet().reverseRangeByScore(key, data[1], data[0]);
+        return redis.opsForZSet().reverseRangeByScore(key, data[0], data[1]);
     }
 
     private String chaveContaExtrato(String contaId) {
